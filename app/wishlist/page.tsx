@@ -12,11 +12,15 @@ const WISHLIST_CATEGORIES = [
       "Stand mixer",
       "Pots & pans",
       "Air fryer",
+      "Washing Machine",
+      "Air Conditioner",
+      "Range Hood",
+      "Television"
     ],
   },
   {
     title: "Electronic & games",
-    items: ["Wifi printer", "Speaker (sound system)", "Standing table"],
+    items: ["Wifi printer", "Speaker (sound system)", "Standing table", "Portable Power Station"],
   },
   {
     title: "Home essentials",
