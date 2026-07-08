@@ -7,15 +7,13 @@ const WISHLIST_CATEGORIES = [
     items: [
       "Bread toaster",
       "Microwave",
-      "Induction stove",
       "Coffee maker",
       "Stand mixer",
       "Pots & pans",
       "Air fryer",
       "Washing Machine",
       "Air Conditioner",
-      "Range Hood",
-      "Television"
+      "Heavy Duty Grill"
     ],
   },
   {
@@ -24,7 +22,18 @@ const WISHLIST_CATEGORIES = [
   },
   {
     title: "Home essentials",
-    items: ["Air purifier", "Handheld vacuum", "Robot vacuum", "Humidifier"],
+    items: [
+      "Air purifier", 
+      "Handheld vacuum", 
+      "Robot vacuum", 
+      "Humidifier", 
+      "Cordless Drill", 
+      "Power Washer", 
+      "Bedsheet Set (Queen Sized)", 
+      "Queen Sized bed", 
+      "Comforter (Queen Sized)",
+      "Plants"
+    ],
   },
   {
     title: "Bathroom",
