@@ -12,17 +12,23 @@ type RsvpSectionProps = {
 };
 
 export function RsvpSection({ invitee, guests }: RsvpSectionProps) {
-  const [responses, setResponses] = useState<Record<string, boolean>>(() => {
-    const initial: Record<string, boolean> = {};
+  const [responses, setResponses] = useState<Record<string, boolean | null>>(() => {
+    const initial: Record<string, boolean | null> = {};
     for (const g of guests) {
-      initial[g.id] = g.attending ?? false;
+      initial[g.id] = g.attending ?? null;
     }
     return initial;
   });
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const rsvpClosed = isRsvpClosed();
 
-  const submitRsvp = async (attendingByGuestId: Record<string, boolean>) => {
+  const getResponseLabel = (response: boolean | null | undefined) => {
+    if (response === true) return "Attending";
+    if (response === false) return "Not attending";
+    return "No response recorded";
+  };
+
+  const submitRsvp = async (attendingByGuestId: Record<string, boolean | null>) => {
     if (rsvpClosed) {
       setStatus("error");
       return;
@@ -36,7 +42,7 @@ export function RsvpSection({ invitee, guests }: RsvpSectionProps) {
           inviteeId: invitee.id,
           responses: guests.map((g) => ({
             guestId: g.id,
-            attending: attendingByGuestId[g.id] ?? false,
+            attending: attendingByGuestId[g.id] ?? null,
           })),
         }),
       });
@@ -68,6 +74,26 @@ export function RsvpSection({ invitee, guests }: RsvpSectionProps) {
       <p className="text-center font-mono text-lg text-muted-foreground sm:text-xl">
         {invitee.displayName}
       </p>
+
+      {rsvpClosed && (
+        <ul className="flex w-full max-w-2xl flex-col gap-3">
+          {guests.map((g) => {
+            const response = responses[g.id] ?? null;
+
+            return (
+              <li
+                key={g.id}
+                className="flex flex-col gap-2 rounded-md border border-border bg-card px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <span className="font-mono text-base text-foreground sm:text-lg">{g.name}</span>
+                <span className="font-mono text-sm text-muted-foreground">
+                  {getResponseLabel(response)}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
 
       {!rsvpClosed && isFamily && (
         <ul className="flex flex-col gap-4">

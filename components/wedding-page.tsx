@@ -866,7 +866,6 @@ function SceneNineRsvp({ initialSlug }: { initialSlug?: string }) {
 
   const handleFamilyLookup = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (rsvpClosed) return;
     const trimmed = familyName.trim();
     if (!trimmed) return;
 
@@ -876,7 +875,11 @@ function SceneNineRsvp({ initialSlug }: { initialSlug?: string }) {
       const payload = await loadInvitee({ familyName: trimmed });
       applyInviteePayload(payload);
       router.push(`/${payload.invitee.slug}#rsvp`);
-      setLookupMessage(`Welcome, ${payload.invitee.displayName}.`);
+      setLookupMessage(
+        rsvpClosed
+          ? `RSVP status loaded for ${payload.invitee.displayName}.`
+          : `Welcome, ${payload.invitee.displayName}.`
+      );
     } catch (err) {
       setLookupStatus("error");
       setLookupMessage(err instanceof Error ? err.message : "Failed to find family");
@@ -935,6 +938,11 @@ function SceneNineRsvp({ initialSlug }: { initialSlug?: string }) {
 
   const isFamily = invitee?.type === "family";
   const individualGuest = guests[0];
+  const getResponseLabel = (response: boolean | null | undefined) => {
+    if (response === true) return "Attending";
+    if (response === false) return "Not attending";
+    return "No response recorded";
+  };
 
   return (
     <div
@@ -948,7 +956,9 @@ function SceneNineRsvp({ initialSlug }: { initialSlug?: string }) {
         RSVP
       </h2>
       {rsvpClosed && (
-        <p className="mt-3 text-center font-mono text-base text-white/90 sm:text-lg">{RSVP_CLOSED_MESSAGE}</p>
+        <p className="mt-3 max-w-3xl text-center font-mono text-base text-white/90 sm:text-lg">
+          {RSVP_CLOSED_MESSAGE}
+        </p>
       )}
       {!rsvpClosed && !invitee && (
         <p className="mt-3 text-center font-mono text-sm text-white/90 sm:text-base">
@@ -956,13 +966,13 @@ function SceneNineRsvp({ initialSlug }: { initialSlug?: string }) {
         </p>
       )}
 
-      {!invitee && !rsvpClosed && (
+      {!invitee && (
         <form
           onSubmit={handleFamilyLookup}
           className="mt-8 w-full max-w-xl rounded-lg border border-white/35 bg-black/35 p-4 sm:p-6"
         >
           <p className="mb-4 text-center font-mono text-sm text-white/90 sm:text-base">
-            Enter your family name or your last name to continue.
+            Enter your family name or your last name to {rsvpClosed ? "view your RSVP status" : "continue"}.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Input
@@ -972,7 +982,7 @@ function SceneNineRsvp({ initialSlug }: { initialSlug?: string }) {
               className="font-mono text-white placeholder:text-white/50"
             />
             <Button type="submit" disabled={lookupStatus === "loading"} className="font-mono">
-              {lookupStatus === "loading" ? "Finding..." : "Continue"}
+              {lookupStatus === "loading" ? "Finding..." : rsvpClosed ? "View status" : "Continue"}
             </Button>
           </div>
           {lookupMessage && (
@@ -985,6 +995,40 @@ function SceneNineRsvp({ initialSlug }: { initialSlug?: string }) {
             </p>
           )}
         </form>
+      )}
+
+      {invitee && rsvpClosed && (
+        <div className="rsvp-scroll-panel mt-7 max-h-[68vh] w-full max-w-2xl overflow-y-auto rounded-lg border border-white/35 bg-black/35 p-4 sm:max-h-[64vh] sm:p-6">
+          <p className="mb-4 text-center font-mono text-sm leading-relaxed text-white/95 sm:text-lg">
+            RSVP status for {invitee.displayName}
+          </p>
+          <ul className="space-y-3">
+            {guests.map((guest) => {
+              const response = responses[guest.id] ?? null;
+              const responseLabel = getResponseLabel(response);
+
+              return (
+                <li
+                  key={guest.id}
+                  className="flex flex-col gap-2 rounded-md border border-white/20 bg-black/25 px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <span className="font-mono text-sm text-white sm:text-lg">{guest.name}</span>
+                  <span
+                    className={`w-fit rounded-md border px-3 py-1 font-mono text-xs uppercase tracking-[0.08em] sm:text-sm ${
+                      response === true
+                        ? "border-emerald-300/60 bg-emerald-500/20 text-emerald-100"
+                        : response === false
+                          ? "border-red-300/60 bg-red-500/20 text-red-100"
+                          : "border-white/25 bg-white/10 text-white/75"
+                    }`}
+                  >
+                    {responseLabel}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       )}
 
       {invitee && isFamily && !rsvpClosed && (
@@ -1286,13 +1330,25 @@ export function WeddingPage({ initialSlug }: WeddingPageProps) {
   const scenes = useMemo<CinematicStripScene[]>(
     () => [
       ...SCENES_BASE,
+      // RSVP is kept here for easy restoration after the wedding.
+      // {
+      //   id: "rsvp",
+      //   videoSrc: "/videos/bus_vid.mp4",
+      //   poster: "/images/posters/bus_vid.jpg",
+      //   holdVh: 0,
+      //   contentClassName: "pointer-events-auto",
+      //   content: <SceneNineRsvp initialSlug={initialSlug} />,
+      // },
       {
         id: "rsvp",
         videoSrc: "/videos/bus_vid.mp4",
         poster: "/images/posters/bus_vid.jpg",
         holdVh: 0,
-        contentClassName: "pointer-events-auto",
-        content: <SceneNineRsvp initialSlug={initialSlug} />,
+        content: (
+          <p className="px-4 text-center font-mono text-4xl font-bold text-white sm:text-6xl md:text-7xl">
+            We can&apos;t wait to see you there!
+          </p>
+        ),
       },
     ],
     [initialSlug]
