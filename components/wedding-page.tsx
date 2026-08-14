@@ -1345,9 +1345,11 @@ export function WeddingPage({ initialSlug }: WeddingPageProps) {
         poster: "/images/posters/bus_vid.jpg",
         holdVh: 0,
         content: (
-          <p className="px-4 text-center font-mono text-4xl font-bold text-white sm:text-6xl md:text-7xl">
-            We can&apos;t wait to see you there!
-          </p>
+          <div className="flex h-full items-center justify-center p-4 text-center sm:p-6">
+            <h2 className="font-mono text-4xl font-bold text-white sm:text-6xl">
+              We can&apos;t wait to see you there!
+            </h2>
+          </div>
         ),
       },
     ],
