@@ -1346,9 +1346,9 @@ export function WeddingPage({ initialSlug }: WeddingPageProps) {
         holdVh: 0,
         content: (
           <div className="flex h-full items-center justify-center p-4 text-center sm:p-6">
-            <h2 className="font-mono text-4xl font-bold text-white sm:text-6xl">
+            <p className="font-mono text-xl leading-relaxed text-white sm:text-2xl">
               We can&apos;t wait to see you there!
-            </h2>
+            </p>
           </div>
         ),
       },
